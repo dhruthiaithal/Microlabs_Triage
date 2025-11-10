@@ -2,6 +2,11 @@ import os
 import random
 import pickle
 import pandas as pd
+# xgboost may be required for the pickled model (either Booster or sklearn wrapper)
+try:
+    import xgboost as xgb
+except Exception:
+    xgb = None
 from typing import List
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,7 +15,9 @@ from datetime import datetime
 
 # CONFIGURATION
 DATA_DIR = "data"
-MODEL_PATH = os.path.join("models", "xgb_model_risk1.pkl")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # path to agent folder
+MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "xgb_model_risk1.pkl")
+MODEL_PATH = os.path.abspath(MODEL_PATH)
 TRIAGE_OUTPUT_PATH = os.path.join(DATA_DIR, "triage_output.csv")
 PATIENT_STATUS_PATH = os.path.join(DATA_DIR, "patient_status.csv")
 
@@ -35,7 +42,9 @@ async def load_model():
         try:
             with open(MODEL_PATH, "rb") as f:
                 MODEL = pickle.load(f)
-            print(f"Model loaded from {MODEL_PATH}")
+            # Report model type for debugging
+            model_type = type(MODEL)
+            print(f"Model loaded from {MODEL_PATH}; type={model_type}")
         except Exception as e:
             MODEL = None
             print(f"Error loading model: {e}. Running in rule-based mode.")
@@ -118,7 +127,28 @@ def get_model_prediction(patient: Patient) -> PredictionResult:
             "abnormal_count": patient.abnormal_count
         }])
 
-        pred_class = MODEL.predict(input_df)[0]
+        # Handle several model types gracefully:
+        # - scikit-learn / xgboost sklearn wrapper (has predict accepting DataFrame)
+        # - xgboost.core.Booster (requires DMatrix)
+        pred_class = None
+        if xgb is not None and hasattr(xgb, 'core') and isinstance(MODEL, getattr(xgb, 'core').Booster):
+            # xgboost native Booster -> convert to DMatrix and predict
+            dmat = xgb.DMatrix(input_df)
+            raw_pred = MODEL.predict(dmat)
+            # raw_pred may be probabilities or class scores
+            if hasattr(raw_pred, 'ndim') and raw_pred.ndim > 1 and raw_pred.shape[1] > 1:
+                pred_class = int(raw_pred.argmax(axis=1)[0])
+            else:
+                # binary-prob case: threshold 0.5
+                pred_class = int(raw_pred[0] > 0.5)
+        else:
+            # Try the common sklearn-like predict
+            pred = MODEL.predict(input_df)
+            # pred may be array-like
+            if hasattr(pred, '__len__'):
+                pred_class = int(pred[0])
+            else:
+                pred_class = int(pred)
 
         if pred_class == 0:
             risk = "Minimal (GREEN)"
