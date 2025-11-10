@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fever Diagnostic Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .markdown-content h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+        .markdown-content ul {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .markdown-content li {
+            margin-bottom: 0.25rem;
+        }
+        .markdown-content strong {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <!-- Header -->
+        <div class="text-center mb-8 fade-in">
+            <div class="inline-block bg-white rounded-full p-4 shadow-lg mb-4">
+                <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Fever Diagnostic Assistant</h1>
+            <p class="text-gray-600 text-lg">AI-powered symptom analysis for better health insights</p>
+            <div class="mt-4 inline-block bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-lg text-sm">
+                ⚠️ This tool provides information only. Always consult a healthcare professional.
+            </div>
+        </div>
+        
+        <!-- Main Form Card -->
+        <div class="bg-white rounded-xl shadow-xl p-8 mb-6 fade-in">
+            <form id="symptomForm" class="space-y-6">
+                <!-- Temperature and Duration Row -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Temperature -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-gray-700 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 2a1 1 0 011 1v8.5a2.5 2.5 0 11-2 0V3a1 1 0 011-1z"/>
+                            </svg>
+                            Temperature (°F) *
+                        </label>
+                        <input type="number" 
+                               name="temperature" 
+                               id="temperature"
+                               step="0.1" 
+                               min="95" 
+                               max="110" 
+                               required 
+                               placeholder="e.g., 101.5"
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
+                        <p class="text-xs text-gray-500">Normal: 97-99°F | Fever: 100.4°F+</p>
+                    </div>
+
+                    <!-- Duration -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-gray-700 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                            </svg>
+                            Duration (days) *
+                        </label>
+                        <input type="number" 
+                               name="duration" 
+                               id="duration"
+                               min="0" 
+                               max="365" 
+                               required 
+                               placeholder="e.g., 3"
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
+                        <p class="text-xs text-gray-500">How many days have you had a fever?</p>
+                    </div>
+                </div>
+
+                <!-- Symptoms -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-gray-700 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        Symptoms & Observations *
+                    </label>
+                    <textarea name="additional_symptoms" 
+                              id="additional_symptoms"
+                              required 
+                              placeholder="Example: Persistent cough, body aches, headache, fatigue, loss of appetite. Started 3 days ago, getting progressively worse."
+                              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                              rows="4"></textarea>
+                    <p class="text-xs text-gray-500">Describe all symptoms, their severity, and when they started</p>
+                </div>
+
+                <!-- Optional Information -->
+                <div class="border-t pt-6">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                        </svg>
+                        Additional Information (Optional)
+                    </h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Medical History -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Medical History</label>
+                            <textarea name="medical_history" 
+                                      id="medical_history"
+                                      placeholder="Example: Asthma, diabetes, hypertension, recent surgeries, allergies, etc."
+                                      class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                                      rows="3"></textarea>
+                            <p class="text-xs text-gray-500">Include any relevant medical conditions</p>
+                        </div>
+
+                        <!-- Current Medications -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Current Medications</label>
+                            <textarea name="medications" 
+                                      id="medications"
+                                      placeholder="Example: Lisinopril 10mg daily, Metformin 500mg twice daily, etc."
+                                      class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                                      rows="3"></textarea>
+                            <p class="text-xs text-gray-500">List all medications and supplements</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit"
+                        id="submitBtn"
+                        class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition transform hover:scale-[1.02] font-semibold text-lg shadow-lg">
+                    <span id="submitText">🔍 Analyze Symptoms</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="hidden bg-white rounded-xl shadow-xl p-8 mb-6 fade-in">
+            <div class="flex flex-col items-center justify-center space-y-4">
+                <div class="relative">
+                    <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-200"></div>
+                    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600 absolute top-0 left-0"></div>
+                </div>
+                <div class="text-center">
+                    <p class="text-lg font-semibold text-gray-800">Analyzing Your Symptoms</p>
+                    <p class="text-sm text-gray-500 pulse-animation">Please wait while our AI processes your information...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Result -->
+        <div id="analysisResult" class="hidden bg-white rounded-xl shadow-xl p-8 fade-in">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    Analysis Complete
+                </h2>
+                <button id="copyAnalysisBtn"
+                        class="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg transition text-sm font-medium text-gray-700">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                    <span id="copyBtnText">Copy Analysis</span>
+                </button>
+            </div>
+            
+            <div id="analysisContent" class="markdown-content prose max-w-none text-gray-700"></div>
+            
+            <div class="mt-8 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+                <div class="flex">
+                    <svg class="w-5 h-5 text-blue-500 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <div class="text-sm text-blue-800">
+                        <p class="font-semibold mb-1">Important Disclaimer</p>
+                        <p>This is AI-generated analysis for informational purposes only. It should not replace professional medical consultation. If you experience severe symptoms or have concerns, please consult a healthcare provider immediately.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-center">
+                <button id="newAnalysisBtn"
+                        class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition font-semibold">
+                    ← Analyze New Symptoms
+                </button>
+            </div>
+        </div>
+
+        <!-- Error Display -->
+        <div id="errorDisplay" class="hidden bg-red-50 border border-red-200 rounded-xl p-6 mb-6 fade-in">
+            <div class="flex items-start">
+                <svg class="w-6 h-6 text-red-500 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                <div>
+                    <h3 class="text-lg font-semibold text-red-800 mb-1">Error</h3>
+                    <p id="errorMessage" class="text-red-700"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+const form = document.getElementById('symptomForm');
+const loadingIndicator = document.getElementById('loadingIndicator');
+const analysisResult = document.getElementById('analysisResult');
+const analysisContent = document.getElementById('analysisContent');
+const errorDisplay = document.getElementById('errorDisplay');
+const errorMessage = document.getElementById('errorMessage');
+const submitBtn = document.getElementById('submitBtn');
+const submitText = document.getElementById('submitText');
+
+function showError(message) {
+    errorMessage.textContent = message;
+    errorDisplay.classList.remove('hidden');
+    setTimeout(() => errorDisplay.classList.add('hidden'), 8000);
+}
+function hideAll() {
+    loadingIndicator.classList.add('hidden');
+    analysisResult.classList.add('hidden');
+    errorDisplay.classList.add('hidden');
+}
+function markdownToHtml(markdown) {
+    let html = markdown
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/^[-*] (.+)$/gm, '<li>$1</li>');
+    html = html.replace(/((?:<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>');
+    html = html.replace(/\n{2,}/g, '<br><br>');
+    return html;
+}
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const temp = parseFloat(formData.get('temperature'));
+    const dur = parseInt(formData.get('duration'));
+    const symptoms = formData.get('additional_symptoms');
+
+    if (isNaN(temp) || temp < 95 || temp > 110) {
+        showError("Enter a valid temperature between 95°F and 110°F");
+        return;
+    }
+    if (isNaN(dur) || dur < 0) {
+        showError("Enter a valid duration in days");
+        return;
+    }
+    if (!symptoms || symptoms.trim().length < 5) {
+        showError("Describe your symptoms (at least 5 characters)");
+        return;
+    }
+
+    const data = {
+        temperature: temp,
+        duration: dur,
+        additional_symptoms: symptoms.trim(),
+        medical_history: formData.get('medical_history') || null,
+        medications: formData.get('medications') || null
+    };
+
+
+    // fallback API URL
+    const apiUrl = (location.protocol === 'file:' ? 'http://127.0.0.1:8000/analyze' : '/analyze');
+
+    // Show loading state immediately
+    hideAll();
+    loadingIndicator.classList.remove('hidden');
+    submitBtn.disabled = true;
+    submitText.textContent = '⏳ Processing...';
+
+    try {
+        const resp = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+
+        console.log('Response status:', resp.status);
+        console.log('Response headers:', {
+            'Content-Type': resp.headers.get('Content-Type'),
+            'Content-Length': resp.headers.get('Content-Length')
+        });
+
+        // Read response as text first for debugging
+        const respText = await resp.text();
+        console.log('Raw response text:', respText);
+
+        if (!respText) {
+            throw new Error('Empty response from server');
+        }
+
+        let result;
+        try {
+            result = JSON.parse(respText);
+        } catch (parseErr) {
+            console.error('JSON parse failed:', parseErr);
+            throw new Error('Server returned invalid JSON: ' + respText.substring(0, 100));
+        }
+
+        if (!resp.ok) {
+            throw new Error(result.detail || `HTTP ${resp.status}: Analysis failed`);
+        }
+
+        if (!result.success) {
+            throw new Error(result.detail || 'Analysis failed (success flag false)');
+        }
+
+        // Display result
+        hideAll();
+        analysisResult.classList.remove('hidden');
+        analysisContent.innerHTML = markdownToHtml(result.analysis || 'No analysis available.');
+        analysisResult.scrollIntoView({ behavior: 'smooth' });
+    } catch (err) {
+        console.error('Fetch error:', err);
+        showError(err.message || 'An error occurred.');
+        hideAll();
+    } finally {
+        submitBtn.disabled = false;
+        submitText.textContent = '🔍 Analyze Symptoms';
+    }
+});
+</script>
+
+        
+</body>
+</html>
