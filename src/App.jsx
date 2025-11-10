@@ -781,7 +781,7 @@ const TriageDashboard = ({ facility, patients, userId, setPatients, toggleDarkMo
                 </button>
             </header>
 
-            <ResourceForecastPanel facility={facility} />
+            
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
                 <TriageStatusIndicator level={totalPatients} label="Total in Queue" colorClass="bg-indigo-600" />
@@ -969,82 +969,25 @@ export default function App() {
         return <FacilitySetup userId={userId} setFacility={setFacility} setIsSetupComplete={() => setView('dashboard')} toggleDarkMode={toggleDarkMode} darkMode={darkMode} />;
     }
 
-    if (view === 'dashboard' && facility) {
-  return (
-    <div className="p-6 space-y-4">
-      <TriageDashboard
-        userId={userId}
-        facility={facility}
-        patients={patients}
-        setPatients={setPatients}
-        toggleDarkMode={toggleDarkMode}
-        darkMode={darkMode}
-      />
+        if (view === 'dashboard' && facility) {
+                return (
+                        <div className="p-6 space-y-4">
+                                <TriageDashboard
+                                        userId={userId}
+                                        facility={facility}
+                                        patients={patients}
+                                        setPatients={setPatients}
+                                        toggleDarkMode={toggleDarkMode}
+                                        darkMode={darkMode}
+                                />
+                        </div>
+                );
+        }
 
-      {/* Allocation Button */}
-      <div className="flex justify-center">
-        <button
-          onClick={handleAllocation}
-          disabled={isAllocating}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-500"
-        >
-          {isAllocating ? "Allocating..." : "Allocate Patients"}
-        </button>
-      </div>
-
-      {/* Display Results */}
-      {allocationResult.length > 0 && (
-        <div className="mt-6 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2 text-indigo-700 dark:text-indigo-300">
-            Allocation Results
-          </h3>
-          <ul className="space-y-2">
-            {allocationResult.map((r, i) => (
-              <li key={i} className="text-sm text-gray-700 dark:text-gray-200">
-                Patient <b>{r.patient_id}</b> → Hospital <b>{r.hospital_id}</b>{" "}
-                (Distance: {r.distance}, Severity: {r.severity})
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-}
-
-
-    return (
-        <div className="flex items-center justify-center min-h-screen bg-red-100 dark:bg-red-900">
-            <p className="text-xl text-red-700 dark:text-red-300">System initialization error. Please refresh.</p>
-        </div>
-    );
-
-    const [allocationResult, setAllocationResult] = useState([]);
-    const [isAllocating, setIsAllocating] = useState(false);
-
-    async function handleAllocation() {
-    setIsAllocating(true);
-    try {
-        const response = await fetch("http://127.0.0.1:8001/allocate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            patients: patients,
-            hospitals: facility ? facility.hospitals : []
-        })
-    });
-
-    if (!response.ok) throw new Error("Failed to allocate");
-
-    const data = await response.json();
-    setAllocationResult(data);
-    alert("✅ Patient allocation completed!");
-  } catch (err) {
-    console.error(err);
-    alert("❌ Allocation failed. Check server logs.");
-  } finally {
-    setIsAllocating(false);
-  }
-}
+        return (
+                <div className="flex items-center justify-center min-h-screen bg-red-100 dark:bg-red-900">
+                        <p className="text-xl text-red-700 dark:text-red-300">System initialization error. Please refresh.</p>
+                </div>
+        );
 
 }
